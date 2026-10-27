@@ -43,6 +43,24 @@ python -m pytest
 
 ## 输出文件
 
+真实地图采集（范围由配置文件指定）：
+
+```bash
+python -m minijapan fetch-area --config data/regions/ikebukuro_east.yaml --out data/raw/area_snapshot
+```
+
+输出原始 `osm.json`、WGS84 坐标的 `features.geojson`、`preview.svg`、
+数据质量 `quality.json` 和包含来源、时间、SHA256、许可的 `manifest.json`。
+每次使用新目录，避免覆盖历史快照。原始地图数据不提交到 Git。
+服务不可用时可以使用 `--endpoint` 更换 Overpass 服务；本机 Python TLS
+不兼容时可用 `--transport curl`（需要系统安装 curl）。已有快照用
+`--input 路径/osm.json` 离线重处理，此时不会声称重新获取了在线数据。
+
+当前支持道路折线、闭合建筑轮廓和兴趣点。关系型复合建筑尚未拼接，
+会逐项记录在质量报告中，完整成员仍保留在原始快照。缺失高度不自动补造，
+采集边界外的完整对象暂不裁切。数据遵循
+[OpenStreetMap 许可与署名要求](https://www.openstreetmap.org/copyright)。
+
 运行 `plan` 后会生成：
 
 - `plan.json`：城市、站点、线路几何和执行参数；
@@ -78,7 +96,7 @@ Minecraft 内的辅助 Mod 或导入工具未来负责：
 
 - Minecraft 世界写入；
 - `.schem` 或 `.litematic` 导出；
-- 真实 GIS 数据导入；
+- 复合建筑关系拼接、GIS 到方块坐标的转换和生成；
 - Minecraft 方块注册表扫描和其他模组方块的运行时解析；
 - 门面计划到实际方块的体素生成；
 - 真实 MTR 写入适配器；

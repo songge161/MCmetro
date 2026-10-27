@@ -11,6 +11,7 @@ from typing import Any, Dict, List, Optional
 from . import __version__
 from .config import load_config
 from .errors import ConfigurationError
+from .geodata import fetch_area
 from .planner import write_plan_outputs
 from .validation import validate_config_model
 
@@ -21,6 +22,12 @@ def _parser() -> argparse.ArgumentParser:
     )
     subparsers = parser.add_subparsers(dest="command", required=True)
     subparsers.add_parser("doctor", help="report local tool versions and MVP capabilities")
+    fetch = subparsers.add_parser("fetch-area", help="采集真实地图并输出来源与质量报告")
+    fetch.add_argument("--config", required=True, type=Path)
+    fetch.add_argument("--out", required=True, type=Path)
+    fetch.add_argument("--input", type=Path, help="离线重处理 Overpass JSON")
+    fetch.add_argument("--endpoint", default="https://overpass-api.de/api/interpreter")
+    fetch.add_argument("--transport", choices=("urllib", "curl"), default="urllib")
     for command in ("validate", "plan"):
         command_parser = subparsers.add_parser(
             command, help=f"{command} a YAML project configuration"
@@ -55,6 +62,10 @@ def main(argv: Optional[List[str]] = None) -> None:
     try:
         if args.command == "doctor":
             raise SystemExit(_doctor())
+        if args.command == "fetch-area":
+            result = fetch_area(args.config, args.out, args.input, args.endpoint, args.transport)
+            print(json.dumps(result, ensure_ascii=False, indent=2))
+            return
         config = load_config(args.config)
         if args.command == "validate":
             issues = [issue.as_dict() for issue in validate_config_model(config)]
@@ -68,7 +79,7 @@ def main(argv: Optional[List[str]] = None) -> None:
             )
         )
         raise SystemExit(0 if "plan" in outputs else 1)
-    except ConfigurationError as error:
+    except (ConfigurationError, ValueError, OSError) as error:
         print(
             json.dumps(
                 {"status": "invalid", "errors": [{"message": str(error)}]},
