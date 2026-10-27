@@ -11,6 +11,18 @@ compression:
   preserve_cardinal_directions: true
   protect_landmark_envelopes: true
   factor: 0.85
+materials:
+  profile: vanilla_safe
+  slots:
+    facade_wall:
+      preferred: [minecraft:bricks]
+      fallback: minecraft:stone
+    facade_window:
+      preferred: [minecraft:gray_stained_glass]
+      fallback: minecraft:glass
+    storefront_sign:
+      preferred: [minecraft:glowstone]
+      fallback: minecraft:lantern
 stations:
   - {id: tokyo, name_ja: 東京, name_en: Tokyo, x_hint: 0, z_hint: 0, role: national_hub}
   - {id: akihabara, name_ja: 秋葉原, name_en: Akihabara, x_hint: 160, z_hint: -110, role: district_station}
@@ -26,7 +38,25 @@ routes:
     name: Demo B · West Urban Connector
     station_ids: [tokyo, shinjuku, shibuya]
     demo_only: true
+facades:
+  - id: akihabara_frontage_demo
+    anchor_station_id: akihabara
+    offset: {x: 28, z: -18}
+    width: 18
+    depth: 8
+    floors: 4
+    style_id: dense_commercial
+    storefront_count: 3
+    windows_per_floor: 4
+  - id: shinjuku_frontage_demo
+    anchor_station_id: shinjuku
+    offset: {x: 24, z: 12}
+    width: 16
+    depth: 10
+    floors: 6
+    style_id: office_commercial
+    storefront_count: 2
+    windows_per_floor: 5
 output:
   preview_format: svg
   json_indent: 2
-

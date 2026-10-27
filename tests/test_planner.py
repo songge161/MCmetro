@@ -7,6 +7,8 @@ import yaml
 from minijapan.compression import compress_layout
 from minijapan.config import load_config
 from minijapan.errors import ConfigurationError
+from minijapan.materials import resolve_material_slots
+from minijapan.models import MaterialSlot
 from minijapan.planner import build_plan, write_plan_outputs
 from minijapan.validation import validate_plan_shape
 
@@ -22,6 +24,8 @@ def _write_config(tmp_path: Path, sample_path: Path, mutate):
 def test_sample_has_five_stations_and_two_routes(sample_config):
     assert len(sample_config.stations) == 5
     assert len(sample_config.routes) == 2
+    assert len(sample_config.facades) == 2
+    assert sample_config.material_profile == "vanilla_safe"
 
 
 def test_invalid_coordinate_is_rejected(tmp_path, sample_path):
@@ -58,6 +62,25 @@ def test_repeated_station_in_route_is_rejected(tmp_path, sample_path):
         load_config(path)
 
 
+def test_invalid_facade_anchor_is_rejected(tmp_path, sample_path):
+    path = _write_config(
+        tmp_path,
+        sample_path,
+        lambda data: data["facades"][0].update({"anchor_station_id": "missing"}),
+    )
+    with pytest.raises(ConfigurationError, match="unknown station id"):
+        load_config(path)
+
+
+def test_invalid_material_id_is_rejected(tmp_path, sample_path):
+    data = yaml.safe_load(sample_path.read_text(encoding="utf-8"))
+    data["materials"]["slots"]["facade_wall"]["fallback"] = "not-a-block-id"
+    path = tmp_path / "config.yaml"
+    path.write_text(yaml.safe_dump(data, allow_unicode=True, sort_keys=False), encoding="utf-8")
+    with pytest.raises(ConfigurationError, match="invalid namespaced block id"):
+        load_config(path)
+
+
 def test_layout_is_deterministic(sample_config):
     first = compress_layout(sample_config)
     second = compress_layout(sample_config)
@@ -91,6 +114,41 @@ def test_plan_contains_geometry_only_rails(sample_config):
     assert issues == []
     assert len(plan["rails"]) == 4
     assert {rail["status"] for rail in plan["rails"]} == {"geometry_only_demo"}
+
+
+def test_plan_contains_facade_modules_and_material_report(sample_config):
+    plan, issues = build_plan(sample_config)
+    assert issues == []
+    assert len(plan["structures"]) == 2
+    assert {item["kind"] for item in plan["structures"]} == {"facade_module"}
+    assert plan["structures"][0]["generation"]["exact_replica"] is False
+    assert plan["materials"]["availability_checked"] is False
+    assert plan["materials"]["selected"]["facade_wall"] == "minecraft:bricks"
+
+
+def test_facade_out_of_bounds_is_reported(tmp_path, sample_path):
+    path = _write_config(
+        tmp_path,
+        sample_path,
+        lambda data: data["facades"][0]["offset"].update({"x": 2000}),
+    )
+    config = load_config(path)
+    _, issues = build_plan(config)
+    assert any(issue["code"] == "facade_out_of_bounds" for issue in issues)
+
+
+def test_material_resolution_uses_runtime_fallback():
+    slots = (
+        MaterialSlot(
+            id="window",
+            preferred=("example:dark_glass",),
+            fallback="minecraft:glass",
+        ),
+    )
+    selected, sources, checked = resolve_material_slots(slots, {"minecraft:glass"})
+    assert selected == {"window": "minecraft:glass"}
+    assert sources == {"window": "fallback"}
+    assert checked is True
 
 
 def test_plan_outputs_are_written(tmp_path, sample_config):

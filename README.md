@@ -13,6 +13,8 @@
 - 校验站点坐标、路线拓扑、最小间距和世界边界；
 - 输出 BuildPlan v1 JSON；
 - 输出校验结果和 SVG 平面预览；
+- 生成门面模块计划，包括楼层、店面数量、窗户密度和街道立面风格；
+- 使用语义材料槽位和首选/降级方块方案；
 - 使用固定 seed 重复生成相同结果；
 - 明确区分演示拓扑、几何规划和真实游戏交通对象。
 
@@ -77,7 +79,8 @@ Minecraft 内的辅助 Mod 或导入工具未来负责：
 - Minecraft 世界写入；
 - `.schem` 或 `.litematic` 导出；
 - 真实 GIS 数据导入；
-- 其他模组方块的兼容配置；
+- Minecraft 方块注册表扫描和其他模组方块的运行时解析；
+- 门面计划到实际方块的体素生成；
 - 真实 MTR 写入适配器；
 - 游戏内可乘坐线路的验收。
 
@@ -87,4 +90,3 @@ Minecraft 内的辅助 Mod 或导入工具未来负责：
 - [MTR 集成调查](docs/research/MTR_INTEGRATION.md)
 - [版本策略](docs/decisions/ADR-0001-version-strategy.md)
 - [许可证决策](LICENSE_DECISION.md)
-

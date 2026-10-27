@@ -51,6 +51,27 @@ class TransitRoute:
 
 
 @dataclass(frozen=True)
+class MaterialSlot:
+    id: str
+    preferred: Tuple[str, ...]
+    fallback: str
+
+
+@dataclass(frozen=True)
+class FacadeSpec:
+    id: str
+    anchor_station_id: str
+    offset_x: int
+    offset_z: int
+    width: int
+    depth: int
+    floors: int
+    style_id: str
+    storefront_count: int = 1
+    windows_per_floor: int = 2
+
+
+@dataclass(frozen=True)
 class CompressionConfig:
     minimum_station_spacing_blocks: float
     preserve_cardinal_directions: bool
@@ -76,6 +97,9 @@ class ProjectConfig:
     compression: CompressionConfig
     stations: Tuple[StationNode, ...]
     routes: Tuple[TransitRoute, ...]
+    material_profile: str
+    material_slots: Tuple[MaterialSlot, ...]
+    facades: Tuple[FacadeSpec, ...]
     output: OutputConfig
 
 

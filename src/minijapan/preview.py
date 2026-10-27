@@ -48,6 +48,22 @@ def render_svg(config: ProjectConfig, plan: Mapping[str, Any]) -> str:
             f'<text x="{WIDTH - 300}" y="{110 + route_index * 24}" fill="{color}" font-family="sans-serif" font-size="14">{escape(route["name"])} · demo</text>'
         )
 
+    for structure in plan.get("structures", []):
+        placement = structure["placement"]
+        size = structure["size"]
+        start_x, start_y = _project(placement["x"], placement["z"], config)
+        end_x, end_y = _project(placement["x"] + size["x"], placement["z"] + size["z"], config)
+        rect_x = min(start_x, end_x)
+        rect_y = min(start_y, end_y)
+        rect_width = max(5, abs(end_x - start_x))
+        rect_height = max(5, abs(end_y - start_y))
+        lines.extend(
+            [
+                f'<rect x="{rect_x:.1f}" y="{rect_y:.1f}" width="{rect_width:.1f}" height="{rect_height:.1f}" fill="#d27b61" fill-opacity="0.24" stroke="#e9a07d" stroke-width="2" stroke-dasharray="5 4"/>',
+                f'<text x="{rect_x + 4:.1f}" y="{rect_y + 15:.1f}" fill="#f5c2a7" font-family="monospace" font-size="11">{escape(structure["id"])} · facade</text>',
+            ]
+        )
+
     for station in plan["stations"]:
         px, py = _project(station["x"], station["z"], config)
         label = escape(station["label_ja"])

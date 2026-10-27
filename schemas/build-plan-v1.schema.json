@@ -3,13 +3,14 @@
   "$id": "https://minijapan.local/schema/build-plan-v1.schema.json",
   "title": "MiniJapan BuildPlan v1",
   "type": "object",
-  "required": ["schema_version", "plan_id", "source", "target", "regions", "stations", "rails", "routes", "structures", "execution"],
+  "required": ["schema_version", "plan_id", "source", "target", "regions", "materials", "stations", "rails", "routes", "structures", "execution"],
   "properties": {
     "schema_version": {"const": "1.0.0"},
     "plan_id": {"type": "string", "minLength": 1},
     "source": {"type": "object"},
     "target": {"type": "object"},
     "regions": {"type": "array"},
+    "materials": {"type": "object", "required": ["profile", "selected"]},
     "stations": {"type": "array", "items": {"type": "object", "required": ["id", "x", "y", "z"]}},
     "rails": {"type": "array"},
     "routes": {"type": "array"},
@@ -17,4 +18,3 @@
     "execution": {"type": "object"}
   }
 }
-

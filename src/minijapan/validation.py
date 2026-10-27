@@ -5,6 +5,7 @@ from collections.abc import Mapping
 from itertools import combinations
 from typing import List
 
+from .materials import is_block_id
 from .models import (
     ProjectConfig,
     ValidationIssue,
@@ -50,6 +51,32 @@ def validate_config_model(config: ProjectConfig) -> List[ValidationIssue]:
         )
     if not config.routes:
         issues.append(ValidationIssue("empty_routes", "/routes", "at least one route is required"))
+
+    material_slot_ids = set()
+    for slot_index, slot in enumerate(config.material_slots):
+        path = f"/materials/slots/{slot_index}"
+        if slot.id in material_slot_ids:
+            issues.append(
+                ValidationIssue(
+                    "duplicate_material_slot", f"{path}/id", f"duplicate material slot: {slot.id}"
+                )
+            )
+        material_slot_ids.add(slot.id)
+        for block_id in (*slot.preferred, slot.fallback):
+            if not is_block_id(block_id):
+                issues.append(
+                    ValidationIssue(
+                        "invalid_block_id", path, f"invalid namespaced block id: {block_id}"
+                    )
+                )
+        if not slot.preferred and not slot.fallback:
+            issues.append(
+                ValidationIssue(
+                    "empty_material_slot",
+                    path,
+                    "a material slot needs a preferred block or fallback",
+                )
+            )
 
     station_ids = set()
     for index, station in enumerate(config.stations):
@@ -118,6 +145,49 @@ def validate_config_model(config: ProjectConfig) -> List[ValidationIssue]:
         issues.append(
             ValidationIssue("invalid_json_indent", "/output/json_indent", "must be between 0 and 8")
         )
+
+    facade_ids = set()
+    for index, facade in enumerate(config.facades):
+        path = f"/facades/{index}"
+        if facade.id in facade_ids:
+            issues.append(
+                ValidationIssue(
+                    "duplicate_facade_id", f"{path}/id", f"duplicate facade id: {facade.id}"
+                )
+            )
+        facade_ids.add(facade.id)
+        if facade.anchor_station_id not in station_ids:
+            issues.append(
+                ValidationIssue(
+                    "missing_facade_anchor",
+                    f"{path}/anchor_station_id",
+                    f"unknown station id: {facade.anchor_station_id}",
+                )
+            )
+        if facade.width <= 0 or facade.depth <= 0 or facade.floors <= 0:
+            issues.append(
+                ValidationIssue(
+                    "invalid_facade_size",
+                    path,
+                    "facade width, depth and floors must be greater than zero",
+                )
+            )
+        if facade.storefront_count <= 0 or facade.storefront_count > facade.width:
+            issues.append(
+                ValidationIssue(
+                    "invalid_storefront_count",
+                    f"{path}/storefront_count",
+                    "storefront_count must be between 1 and facade width",
+                )
+            )
+        if facade.windows_per_floor < 0:
+            issues.append(
+                ValidationIssue(
+                    "invalid_window_count",
+                    f"{path}/windows_per_floor",
+                    "windows_per_floor cannot be negative",
+                )
+            )
     return issues
 
 
@@ -151,6 +221,35 @@ def validate_placements(
     return issues
 
 
+def validate_facade_placements(
+    config: ProjectConfig, placements: Mapping[str, WorldPlacement]
+) -> List[ValidationIssue]:
+    issues: List[ValidationIssue] = []
+    bounds = WorldBounds(
+        min_x=config.bounds.min_x + config.origin.x,
+        max_x=config.bounds.max_x + config.origin.x,
+        min_z=config.bounds.min_z + config.origin.z,
+        max_z=config.bounds.max_z + config.origin.z,
+    )
+    for facade in config.facades:
+        anchor = placements.get(facade.anchor_station_id)
+        if anchor is None:
+            continue
+        x = anchor.x + facade.offset_x
+        z = anchor.z + facade.offset_z
+        if not bounds.contains(x, z) or not bounds.contains(
+            x + facade.width - 1, z + facade.depth - 1
+        ):
+            issues.append(
+                ValidationIssue(
+                    "facade_out_of_bounds",
+                    f"/facades/{facade.id}",
+                    "facade footprint is outside world bounds",
+                )
+            )
+    return issues
+
+
 def validate_plan_shape(plan: Mapping[str, object]) -> List[ValidationIssue]:
     required = (
         "schema_version",
@@ -158,6 +257,7 @@ def validate_plan_shape(plan: Mapping[str, object]) -> List[ValidationIssue]:
         "source",
         "target",
         "regions",
+        "materials",
         "stations",
         "rails",
         "routes",

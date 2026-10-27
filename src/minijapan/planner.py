@@ -6,8 +6,9 @@ from pathlib import Path
 from typing import Any, Dict, List, Tuple
 
 from .compression import compress_layout
+from .materials import material_plan
 from .models import ProjectConfig, TransitRoute, route_to_dict, station_to_dict
-from .validation import validate_plan_shape
+from .validation import validate_facade_placements, validate_plan_shape
 
 
 def _edge_id(route: TransitRoute, index: int) -> str:
@@ -17,6 +18,9 @@ def _edge_id(route: TransitRoute, index: int) -> str:
 def build_plan(config: ProjectConfig) -> Tuple[Dict[str, Any], List[Dict[str, str]]]:
     layout = compress_layout(config)
     issues = [issue.as_dict() for issue in layout.issues]
+    issues.extend(
+        issue.as_dict() for issue in validate_facade_placements(config, layout.placements)
+    )
     if issues:
         return {}, issues
 
@@ -24,6 +28,41 @@ def build_plan(config: ProjectConfig) -> Tuple[Dict[str, Any], List[Dict[str, st
         station_to_dict(station, layout.placements[station.id]) for station in config.stations
     ]
     routes = [route_to_dict(route) for route in config.routes]
+    materials = material_plan(config.material_slots, config.material_profile)
+    structures = []
+    for facade in config.facades:
+        anchor = layout.placements[facade.anchor_station_id]
+        structures.append(
+            {
+                "id": facade.id,
+                "kind": "facade_module",
+                "status": "facade_plan_only",
+                "anchor_station_id": facade.anchor_station_id,
+                "style_id": facade.style_id,
+                "placement": {
+                    "x": anchor.x + facade.offset_x,
+                    "y": anchor.y,
+                    "z": anchor.z + facade.offset_z,
+                    "rotation": "towards_road",
+                },
+                "size": {
+                    "x": facade.width,
+                    "y": facade.floors * 4 + 1,
+                    "z": facade.depth,
+                },
+                "frontage": {
+                    "storefront_count": facade.storefront_count,
+                    "windows_per_floor": facade.windows_per_floor,
+                },
+                "material_intents": sorted(materials["selected"]),
+                "resolved_materials": materials["selected"],
+                "generation": {
+                    "detail_level": "street_frontage",
+                    "exact_replica": False,
+                    "seed": config.seed,
+                },
+            }
+        )
     rails: List[Dict[str, Any]] = []
     for route in config.routes:
         for index, (source_id, target_id) in enumerate(
@@ -76,10 +115,11 @@ def build_plan(config: ProjectConfig) -> Tuple[Dict[str, Any], List[Dict[str, st
                 },
             }
         ],
+        "materials": materials,
         "stations": stations,
         "rails": rails,
         "routes": routes,
-        "structures": [],
+        "structures": structures,
         "execution": {
             "mode": "dry_run",
             "overwrite_policy": "air_only",

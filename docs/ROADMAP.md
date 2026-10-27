@@ -24,6 +24,14 @@ Status: `DONE` for the offline acceptance path.
 
 The YAML sample produces a schema-shaped plan, four geometry-only rail edges, validation output, and SVG preview. The routes are deliberately marked `demo_topology` and `requires_verified_mtr_adapter`.
 
+## M1.5 — 门面与材料兼容计划原型
+
+Status: `DONE` for the external planning layer.
+
+The sample now produces two `facade_module` structure plans. Each module records its anchor station, footprint, floors, storefront count, window density, style profile and material intents. Semantic material slots have deterministic preferred and fallback blocks.
+
+This milestone does not place blocks, inspect an installed mod registry, or preserve block-entity data. The selected materials are explicitly marked as availability-unchecked until a Minecraft bridge provides a registry manifest.
+
 ## M2 — One Minecraft district
 
 Next smallest executable milestone:
@@ -36,4 +44,3 @@ Next smallest executable milestone:
 ## M3 — MTR functional gate
 
 Do not implement a real adapter until source and in-game evidence show how the selected MTR build creates, persists, reloads, and runs stations, platforms, rails, routes, depots, and vehicles. If two focused spikes fail, keep `ManualMtrAdapter`/`MockMtrAdapter` and document the manual configuration path instead.
-

@@ -9,6 +9,8 @@ import yaml
 from .errors import ConfigurationError
 from .models import (
     CompressionConfig,
+    FacadeSpec,
+    MaterialSlot,
     OutputConfig,
     ProjectConfig,
     StationNode,
@@ -158,6 +160,56 @@ def load_config(path: Path) -> ProjectConfig:
             )
         )
 
+    materials_raw = _mapping(root.get("materials", {}), "config.materials")
+    material_profile = _string(
+        materials_raw.get("profile", "vanilla_safe"), "config.materials.profile"
+    )
+    material_slots_raw = _mapping(materials_raw.get("slots", {}), "config.materials.slots")
+    material_slots = []
+    for slot_id, value in material_slots_raw.items():
+        slot_path = f"config.materials.slots.{slot_id}"
+        slot = _mapping(value, slot_path)
+        preferred = tuple(
+            _string(block_id, f"{slot_path}.preferred[{index}]")
+            for index, block_id in enumerate(
+                _list(slot.get("preferred", []), f"{slot_path}.preferred")
+            )
+        )
+        fallback = _string(_required(slot, "fallback", slot_path), f"{slot_path}.fallback")
+        material_slots.append(
+            MaterialSlot(id=_string(slot_id, slot_path), preferred=preferred, fallback=fallback)
+        )
+
+    facade_values = _list(root.get("facades", []), "config.facades")
+    facades = []
+    for index, value in enumerate(facade_values):
+        facade_path = f"config.facades[{index}]"
+        facade = _mapping(value, facade_path)
+        offset = _mapping(facade.get("offset", {"x": 0, "z": 0}), f"{facade_path}.offset")
+        facades.append(
+            FacadeSpec(
+                id=_string(_required(facade, "id", facade_path), f"{facade_path}.id"),
+                anchor_station_id=_string(
+                    _required(facade, "anchor_station_id", facade_path),
+                    f"{facade_path}.anchor_station_id",
+                ),
+                offset_x=_integer(offset.get("x", 0), f"{facade_path}.offset.x"),
+                offset_z=_integer(offset.get("z", 0), f"{facade_path}.offset.z"),
+                width=_integer(_required(facade, "width", facade_path), f"{facade_path}.width"),
+                depth=_integer(_required(facade, "depth", facade_path), f"{facade_path}.depth"),
+                floors=_integer(_required(facade, "floors", facade_path), f"{facade_path}.floors"),
+                style_id=_string(
+                    _required(facade, "style_id", facade_path), f"{facade_path}.style_id"
+                ),
+                storefront_count=_integer(
+                    facade.get("storefront_count", 1), f"{facade_path}.storefront_count"
+                ),
+                windows_per_floor=_integer(
+                    facade.get("windows_per_floor", 2), f"{facade_path}.windows_per_floor"
+                ),
+            )
+        )
+
     output_raw = _mapping(root.get("output", {}), "config.output")
     output = OutputConfig(
         preview_format=str(output_raw.get("preview_format", "svg")),
@@ -175,6 +227,9 @@ def load_config(path: Path) -> ProjectConfig:
         compression=compression,
         stations=tuple(stations),
         routes=tuple(routes),
+        material_profile=material_profile,
+        material_slots=tuple(material_slots),
+        facades=tuple(facades),
         output=output,
     )
     issues = validate_config(config)
