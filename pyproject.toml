@@ -1,0 +1,36 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "minijapan-ai"
+version = "0.1.0"
+description = "Offline planning MVP for a compressed, playable MiniJapan Minecraft world"
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+    "PyYAML>=6.0,<7",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0,<9",
+    "ruff>=0.6,<1",
+]
+
+[project.scripts]
+minijapan = "minijapan.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"
+
+[tool.ruff]
+line-length = 100
+target-version = "py39"
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F", "I"]

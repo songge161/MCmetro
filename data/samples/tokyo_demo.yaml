@@ -1,0 +1,32 @@
+schema_version: "1.0.0"
+project: minijapan-demo
+seed: 42
+mode: offline_demo
+world:
+  name: minijapan_development
+  origin: {x: 0, y: 80, z: 0}
+  bounds: {min_x: -1000, max_x: 1000, min_z: -1000, max_z: 1000}
+compression:
+  minimum_station_spacing_blocks: 100
+  preserve_cardinal_directions: true
+  protect_landmark_envelopes: true
+  factor: 0.85
+stations:
+  - {id: tokyo, name_ja: 東京, name_en: Tokyo, x_hint: 0, z_hint: 0, role: national_hub}
+  - {id: akihabara, name_ja: 秋葉原, name_en: Akihabara, x_hint: 160, z_hint: -110, role: district_station}
+  - {id: ueno, name_ja: 上野, name_en: Ueno, x_hint: 230, z_hint: -260, role: district_station}
+  - {id: shinjuku, name_ja: 新宿, name_en: Shinjuku, x_hint: -350, z_hint: -100, role: regional_hub}
+  - {id: shibuya, name_ja: 渋谷, name_en: Shibuya, x_hint: -350, z_hint: 220, role: regional_hub}
+routes:
+  - id: demo_line_a
+    name: Demo A · East Urban Loop
+    station_ids: [tokyo, akihabara, ueno]
+    demo_only: true
+  - id: demo_line_b
+    name: Demo B · West Urban Connector
+    station_ids: [tokyo, shinjuku, shibuya]
+    demo_only: true
+output:
+  preview_format: svg
+  json_indent: 2
+
