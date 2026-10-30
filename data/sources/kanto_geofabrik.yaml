@@ -1,0 +1,11 @@
+id: geofabrik_kanto
+name: Geofabrik 关东 OSM 区域数据包
+url: https://download.geofabrik.de/asia/japan/kanto-latest.osm.pbf
+format: osm.pbf
+license: ODbL-1.0
+attribution: "© OpenStreetMap contributors"
+purpose: "本地裁切池袋及后续关东样板区；不作为线上查询服务。"
+retention:
+  raw_file: "可保留一个最新版本，替换前校验 SHA256。"
+  derived_snapshots: "保留已用于生成的区域快照及 manifest。"
+  intermediate_files: "导入成功后删除。"

@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "minijapan-ai"
 version = "0.1.0"
-description = "Offline planning MVP for a compressed, playable MiniJapan Minecraft world"
+description = "MC Metro local-first real-city planning and Minecraft district generation"
 readme = "README.md"
 requires-python = ">=3.9"
 dependencies = [
@@ -14,6 +14,7 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = [
+    "nbtlib>=2.0,<3",
     "pytest>=8.0,<9",
     "ruff>=0.6,<1",
 ]

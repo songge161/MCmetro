@@ -4,6 +4,9 @@
 - Date: 2026-10-27
 - Decision scope: offline planning MVP and the future Minecraft runtime
 
+> 本文为 2026-10-27 的候选版本调查，外部证据不是实时兼容性保证。
+> 当前产品范围以 [MC Metro 项目章程](../../doc/PROJECT_KICKOFF.md) 为准；示例城市不限制产品定位。
+
 ## Decision
 
 Keep Minecraft Java 1.20.1 + Fabric + MTR 4.0.x as the first compatibility candidate because the kickoff document prioritises that combination and Station Builder publishes a Fabric 1.20.1 build that lists MTR 4.0.x as its 1.20.x dependency family. This is a candidate baseline, not a compatibility claim.
@@ -38,4 +41,3 @@ Checked 2026-10-27 on macOS ARM64:
 ## Exit criteria for changing the baseline
 
 Change the candidate only after a documented spike shows that the exact 1.20.1 + Fabric + MTR 4.0.x combination cannot build, launch, persist, or support the required two-station test. Compare a 1.21.1/1.21.4 alternative in a new ADR before migrating.
-

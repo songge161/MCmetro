@@ -3,3 +3,4 @@ name: 池袋东口至 Sunshine City 入口采集区
 # 南、西、北、东；采集包络，不是最终建造边界。
 bbox: [35.7278, 139.7110, 35.7320, 139.7195]
 reference: https://sunshinecity.jp/en/information/access.html
+local_source: bbbike_tokyo

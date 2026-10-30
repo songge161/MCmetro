@@ -1,0 +1,20 @@
+id: yuushya_fabric_1_20_1_2_3_0
+kind: mod_release_for_static_inspection
+checked_at: '2026-10-30'
+project: Yuushya Townscape
+minecraft: '1.20.1'
+loader: fabric
+version: '2.3.0'
+release_type: beta
+runtime_baseline_locked: false
+release_page: https://modrinth.com/mod/yuushya-townscape/version/uEQ2095H
+metadata_url: https://api.modrinth.com/v2/version/uEQ2095H
+download_url: https://cdn.modrinth.com/data/lfVtagkm/versions/uEQ2095H/yuushya-1.20.1-fabric-2.3.0.jar
+local_file: data/raw/mods/yuushya-1.20.1-fabric-2.3.0.jar
+size_bytes: 28161213
+sha256: ab1c39d0763d8209aaf5bd6cc193724439dc3ad0738ffcb82af32042981f6518
+publisher_sha512: 3c944f3648a1bf86c065767d6dc57cc171fc843136f254db11bce736d429bfed893ae37f7f60d041032690e2dbab61670f73f4be47b2f9683a0c0079a7521065
+source_repository: https://github.com/XiLaiTL/Yuushya-Townscape
+terms_url: https://github.com/XiLaiTL/Yuushya-Townscape/blob/master/Terms_yuushya_user.md
+license_notes: 代码与美术资源分别核对；不得将 fabric.mod.json 的 MIT 字段理解为整个包的素材许可。
+distribution: 本地分析，不将 JAR、贴图或模型提交到本仓库。

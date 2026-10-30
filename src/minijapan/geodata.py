@@ -34,6 +34,17 @@ def load_area(path):
     return area
 
 
+def classify(tags):
+    """Map OSM tags to the small set of kinds this project currently handles."""
+    if tags.get("building", "no") != "no":
+        return "building"
+    if tags.get("building:part", "no") != "no":
+        return "building_part"
+    if "highway" in tags:
+        return "road"
+    return "poi"
+
+
 def query_for(area):
     bbox = ",".join(str(value) for value in area["bbox"])
     selectors = [
@@ -63,15 +74,7 @@ def normalize(payload):
     for element in payload["elements"]:
         identity = f"{element['type']}/{element['id']}"
         tags = element.get("tags", {})
-        kind = (
-            "building"
-            if tags.get("building", "no") != "no"
-            else "building_part"
-            if tags.get("building:part", "no") != "no"
-            else "road"
-            if "highway" in tags
-            else "poi"
-        )
+        kind = classify(tags)
         geometry = None
         reason = "缺失或不完整几何"
         if element["type"] == "node" and "lon" in element and "lat" in element:

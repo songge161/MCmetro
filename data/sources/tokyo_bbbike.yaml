@@ -1,0 +1,12 @@
+id: bbbike_tokyo
+name: BBBike Tokyo 城市提取包
+url: https://download.bbbike.org/osm/bbbike/Tokyo/Tokyo.osm.pbf
+format: osm.pbf
+license: ODbL-1.0
+attribution: "© OpenStreetMap contributors"
+purpose: "池袋样板区的本地裁切来源；东京都范围，92MB，比关东全量包更适合反复生成。"
+access_note: "download.geofabrik.de 直连被重置；BBBike 经本地代理可下载，Range 请求被拒，只能整包下载。"
+retention:
+  raw_file: "可保留一个最新版本，替换前校验 SHA256。"
+  derived_snapshots: "保留已用于生成的区域快照及 manifest。"
+  intermediate_files: "导入成功后删除。"

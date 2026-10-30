@@ -1,46 +1,95 @@
-# Roadmap
+# MC Metro 项目路线图
 
-## M0 — Foundation and compatibility survey
+范围与验收以 [项目章程 v0.2](../doc/PROJECT_KICKOFF.md) 为准。
+近期主线是实际可探索街区；Yuushya 材料整理和 MTR 技术验证可并行，不以交通自动化阻塞静态生成。
 
-Status: `PARTIAL`.
+## M0：基础设施与兼容性调查
 
-Done in this first pass:
+状态：部分完成。
 
-- Python package and CLI scaffold;
-- local environment report via `minijapan doctor`;
-- version-strategy ADR and source register;
-- offline test path with a deterministic seed;
-- explicit MTR integration boundary and research notes.
+- [x] Python 包、CLI、测试、环境检查与来源登记。
+- [x] 候选版本决策与 MTR 调查边界。
+- [ ] 锁定并启动 Minecraft + Fabric + MTR 精确组合。
+- [ ] 证明目标版本存在安全可用的写入路径。
 
-Still blocked or unverified:
+候选基线为 Java 1.20.1 + Fabric，不是已经验证全部模组兼容。
 
-- no Minecraft 1.20.1 + Fabric + MTR 4.0.x test instance exists locally;
-- no exact target MTR release has been selected for a runtime smoke test;
-- no safe, public batch write API has been proven for the target MTR build.
+## M1：离线规划原型
 
-## M1 — Tokyo five-station compression prototype
+状态：离线验收已完成。
 
-Status: `DONE` for the offline acceptance path.
+五站、两路线演示配置可输出确定性规划、压缩布局和校验预览。
+连接明确标为演示拓扑，不代表真实铁路、真实街区压缩或游戏交通对象。
 
-The YAML sample produces a schema-shaped plan, four geometry-only rail edges, validation output, and SVG preview. The routes are deliberately marked `demo_topology` and `requires_verified_mtr_adapter`.
+## M1.5：门面与语义材料计划
 
-## M1.5 — 门面与材料兼容计划原型
+状态：规划层已完成。
 
-Status: `DONE` for the external planning layer.
+可生成门面模块参数与首选/降级材料计划。未接通游戏注册表或 AI 设计到真实方块的完整链路。
+材料计划的候选选择不等于已确认可用；真实街区的原版基础门面是另一条已实现的生成路径。
 
-The sample now produces two `facade_module` structure plans. Each module records its anchor station, footprint, floors, storefront count, window density, style profile and material intents. Semantic material slots have deterministic preferred and fallback blocks.
+## A / M2：真实街区生成闭环
 
-This milestone does not place blocks, inspect an installed mod registry, or preserve block-entity data. The selected materials are explicitly marked as availability-unchecked until a Minecraft bridge provides a registry manifest.
+状态：部分完成，当前主线。
 
-## M2 — One Minecraft district
+当前采用约 92MB 的 BBBike Tokyo PBF 本地裁切；不依赖在线 Overpass，
+近期存储目标不超过 10GB，总预算 100GB 以内。
 
-Next smallest executable milestone:
+- [x] 本地 PBF 到池袋快照，记录来源、摘要、缺失与遗漏。
+- [x] 道路、建筑轮廓、入口、开放楼层、楼梯和基础照明生成。
+- [x] 单宽/双宽楼梯候选检查与降层原因记录。
+- [x] 不侵占道路的基础橱窗和入口饰带。
+- [x] `.schem`、平面/体量预览、独立 NBT 校验、Windows 导入说明和逐栋验收清单。
+- [ ] Windows 测试世界导入成功。
+- [ ] 实际沿街行走、进入建筑、上下楼梯，核查碰撞和净空。
+- [ ] 保存退出重进后结果正常，记录缺陷与截图。
 
-1. Pin a Minecraft 1.20.1 Fabric instance and a specific MTR 4.0.x release.
-2. Build one hand-authored Tokyo Station shell as a structure fixture.
-3. Add a dry-run block executor and a reversible transaction manifest.
-4. Test import into a disposable world before touching any user save.
+当前样板为 38 栋建筑、29 栋多层、149 个开放楼层；9 栋因模板空间限制简化为单层。
+完整站区与 Sunshine City 地标不在该样板内。详见 [街区样板](architecture/DISTRICT_PILOT.md)。
 
-## M3 — MTR functional gate
+## B：Yuushya 材料与门面
 
-Do not implement a real adapter until source and in-game evidence show how the selected MTR build creates, persists, reloads, and runs stations, platforms, rails, routes, depots, and vehicles. If two focused spikes fail, keep `ManualMtrAdapter`/`MockMtrAdapter` and document the manual configuration path instead.
+状态：进行中；与 A 的 Windows 验收并行，不必等用户提供整合包才开始。
+
+- [x] 固定用于调查的官方发布包、核对摘要与来源，建立静态候选材料目录。
+- [x] 定向核对灰墙与黑窗框的注册定义、连接状态、含水属性和碰撞资源（非游戏验收）。
+- [x] 生成 11 组独立材料测试单元、`.schem` 与逐项验收说明。
+- [ ] 按墙面、玻璃、窗框、门面和街道装饰整理首批材料。
+- [ ] 核对实际注册、合法方块状态、默认值和必要的附加数据。
+- [ ] 接入可检查的材料映射，缺失时明确报告或降级。
+- [ ] 在游戏中验证材料样板的渲染、碰撞、连接与保存。
+- [ ] 通过后接入真实街区，逐步处理文字和自定义模型等复杂装饰。
+
+静态资源清单不充当运行时注册表，也不证明复杂装饰已经支持。
+已检查 1.20.1 Fabric / Yuushya 2.3.0（发布标记 beta），取得 5,773 个资源候选，
+其中 1,331 个直接匹配中文名称；未锁定最终游戏版本。见 [接入调查](research/YUUSHYA_INTEGRATION.md)。
+首组实物测试文件见 [材料样板](architecture/MATERIAL_PROBE.md)，玻璃使用原版对照，未假称 Yuushya 玻璃已适配。
+
+## C：地标、完整街区与选择性压缩
+
+状态：待实施。
+
+- [ ] 更紧凑的转折楼梯，减少窄楼简化。
+- [ ] 复合建筑关系、重要地标与高程处理。
+- [ ] 扩大街区范围，建立地标与交通预留空间。
+- [ ] 在真实街区中选择性压缩普通街段，保护道路宽度、门面和可玩尺寸。
+- [ ] 对照未压缩基线，验收相对位置、空间冲突、通达与视觉连续性。
+
+## 并行 M3：MTR 两站一线技术验证
+
+状态：待游戏实测。
+
+- [ ] 固定精确版本与源码证据，建立手工可运行对照。
+- [ ] 玩家能从 A 站乘车抵达 B 站。
+- [ ] 保存、退出、重进后继续运行。
+- [ ] 区分程序可创建的对象和仍需手工配置的步骤。
+- [ ] 只有证据齐备后实现运行时写入适配器，再验证分岔、合流与信号。
+
+若两次聚焦验证仍不能证实写入路径，保留明确标注的手工/模拟适配，不伪称自动化成功。
+
+## 后续产品化
+
+状态：计划，不是当前交付承诺。
+
+Windows 安装与操作界面、增量生成、更多城市、更多材料包和按需功能适配。
+地图导航优先使用现有模组；飞机、机械、多人服务器等扩展不占用近期主线。

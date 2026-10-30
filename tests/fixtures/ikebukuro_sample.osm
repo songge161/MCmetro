@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<osm version="0.6" generator="mc-metro-test-fixture">
+  <node id="1001" lat="35.72910" lon="139.71320" version="1" timestamp="2026-01-01T00:00:00Z">
+    <tag k="shop" v="convenience"/>
+    <tag k="name" v="Test Mart"/>
+  </node>
+  <node id="2001" lat="35.72900" lon="139.71300"/>
+  <node id="2002" lat="35.72900" lon="139.71350"/>
+  <node id="2003" lat="35.72950" lon="139.71350"/>
+  <node id="2004" lat="35.72950" lon="139.71300"/>
+  <node id="2005" lat="35.72900" lon="139.71300"/>
+  <node id="2011" lat="35.73000" lon="139.71400"/>
+  <node id="2012" lat="35.73000" lon="139.71460"/>
+  <node id="2013" lat="35.73060" lon="139.71460"/>
+  <node id="2014" lat="35.73000" lon="139.71400"/>
+  <node id="2021" lat="35.72850" lon="139.71500"/>
+  <node id="2022" lat="35.72850" lon="139.71600"/>
+  <node id="2023" lat="35.72900" lon="139.71600"/>
+  <way id="3001" version="3" timestamp="2026-01-02T00:00:00Z">
+    <nd ref="2001"/><nd ref="2002"/><nd ref="2003"/><nd ref="2004"/><nd ref="2005"/>
+    <tag k="building" v="retail"/>
+    <tag k="building:levels" v="4"/>
+  </way>
+  <way id="3002">
+    <nd ref="2011"/><nd ref="2012"/><nd ref="2013"/><nd ref="2014"/>
+    <tag k="building" v="yes"/>
+    <tag k="height" v="18"/>
+  </way>
+  <way id="3003">
+    <nd ref="2021"/><nd ref="2022"/><nd ref="2023"/>
+    <tag k="building" v="yes"/>
+  </way>
+  <way id="3004">
+    <nd ref="2001"/><nd ref="2011"/>
+    <tag k="highway" v="footway"/>
+  </way>
+  <relation id="4001">
+    <member type="way" ref="3001" role="outer"/>
+    <tag k="building" v="yes"/>
+    <tag k="type" v="multipolygon"/>
+  </relation>
+</osm>

@@ -1,0 +1,5 @@
+id: ikebukuro_pilot
+name: Sunshine 60 通西段生成样板
+bbox: [35.7292, 139.7143, 35.7306, 139.7163]
+reference: https://sunshinecity.jp/en/information/access.html
+local_source: bbbike_tokyo

@@ -1,6 +1,8 @@
 # Facade generation and material compatibility
 
-This document defines the next layer above station and route planning. It is an external planning contract, not a Minecraft placement implementation.
+本文记录演示规划器的门面与语义材料协议，受 [项目章程](../../doc/PROJECT_KICKOFF.md) 约束。
+它与真实街区生成器尚未完整打通；真实样板已有原版基础门面方块，见
+[街区样板](DISTRICT_PILOT.md)。下文“计划层”不表示整个项目仍不能生成方块。
 
 ## Generation unit
 
@@ -40,5 +42,6 @@ Compatibility therefore has three states:
 2. `structure`: a version-aware structure exporter can encode the block state;
 3. `runtime`: an in-game adapter can place and verify the object and any required block entity data.
 
-The facade milestone currently reaches the planning state only. It intentionally stops before writing Minecraft blocks.
-
+The semantic facade-module contract currently reaches the planning state only.
+The district generator separately exports vanilla shopfront blocks; it does not yet consume this
+material resolver or AI facade files. Yuushya static inventory and runtime validation remain distinct.
